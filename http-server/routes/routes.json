@@ -1,0 +1,5 @@
+{
+  "/api/": "/",
+  "/blog/:resource/:id/show": "/:resource/:id",
+  "/blog1/:resource/:name/:value": "/:resource?:name=:value"
+}
