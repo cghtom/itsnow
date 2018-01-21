@@ -33,15 +33,13 @@
 
 5.打开 package.json，在 scripts 字段添加一行
 
-"scripts": {"server":"json-server db.json",// 新加行"test":"..."}
+"scripts": {"server":"json-server test.json",// 新加行"test":"..."}
 
 6.启动服务 npm run server
 
-db.jsonDoneResources
-
-http://localhost:3000/postshttp://localhost:3000/comments
-
-http://localhost:3000/profile
+http://localhost:3100/posts 
+http://localhost:3100/comments
+http://localhost:3100/profile
 
 三个接口已经生成，支持post(新增) delete(删除) put(修改) get(查询); 
 
@@ -69,3 +67,8 @@ http://localhost:3000/profile
 3.启动服务 cnpm run server
 
 参照http://blog.csdn.net/liqianglai/article/details/53488091
+
+tips: 
+1端口占用可以修改端口：--port 3100
+2自定义路由：--routes routes/routes.json
+
