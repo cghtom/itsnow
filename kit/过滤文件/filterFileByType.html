@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+	<script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+</head>
+<body>
+<script>
+function filterFileType(type,judge,textType,videoType,imgageType){
+	if (type != 'jpg' && type != 'jpeg' && type != 'png' && type != 'gif' && type != 'bmp' && type != 'txt' && type != 'wps' && type != 'rtf' && type != 'doc' && type != 'docx' && type != 'xls' && type != 'xlsx' && type != 'ppt' && type != 'pptx' && type != 'pdf' && type != 'rar' && type != 'zip' && type != 'gz' && type != 'rm' && type != 'avi' && type != 'wma' && type != 'mp3' && type != 'mpg') {
+		return false;
+	}
+	let fileType = type,filterType = 1;
+	if(judge){//对上传文件类型做限制
+		if(fileType === 'txt' || fileType === 'wps' || fileType === 'rtf' || fileType === 'doc' || fileType === 'docx' || fileType === 'xls' || fileType === 'xlsx' || fileType === 'ppt' || fileType === 'pptx' || fileType === 'pdf'){
+			filterType = 1;
+		}else if(fileType === 'avi' || fileType === 'wma' || fileType === 'mp3'){
+			filterType = 2;
+		}else if (type === 'jpg' || type === 'jpeg' || type === 'png' || type === 'gif' || type === 'bmp'){
+            filterType = 3;
+        }
+		if (filterType === 1 && !textType ) {		
+			return false;
+		} else if (filterType === 2 && !videoType) {
+			return false;
+		}else if(filterType === 3 && !imgageType){
+			return false;
+		}
+	}
+	return true;
+}
+$(function(){
+//配置限制： 视频 文件 图片 
+//可以上传那些文件类型的文件
+// 判断当前文件类型为 rtf 
+console.log("可以上传文件吗："+filterFileType("rtf",true,true,true,true));
+	  
+});
+</script>
+</body>
+</html>

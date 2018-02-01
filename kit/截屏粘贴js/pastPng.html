@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+	<script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="tar_box">
+
+</div>
+<div id="images" class="images" style="
+    width: 400px;
+    height: 400px;
+    background: yellow;
+    float: left;
+">
+
+</div>
+<div id="image-images">
+
+</div>
+
+<script>
+
+document.addEventListener('click', function (event) {
+  console.log(event)
+  var isChrome = false;
+  if ( event.clipboardData || event.originalEvent ) {
+    //not for ie11  某些chrome版本使用的是event.originalEvent
+    var clipboardData = (event.clipboardData || event.originalEvent.clipboardData);
+	var pic = event.srcElement;
+	if(pic&&pic.currentSrc){
+	var picPath = pic.currentSrc;
+	picPath = 'data:image/jpg;base64'+picPath.split('data:image/jpg;base64')[1];
+	 uploadImgFromPaste(picPath, 'paste', isChrome);
+	}
+    if ( clipboardData.items ) {
+        // for chrome
+        var  items = clipboardData.items,
+        len = items.length,
+        blob = null;
+        isChrome = true;
+        //items.length比较有意思，初步判断是根据mime类型来的，即有几种mime类型，长度就是几（待验证）
+        //如果粘贴纯文本，那么len=1，如果粘贴网页图片，len=2, items[0].type = 'text/plain', items[1].type = 'image/*'
+        //如果使用截图工具粘贴图片，len=1, items[0].type = 'image/png'
+        //如果粘贴纯文本+HTML，len=2, items[0].type = 'text/plain', items[1].type = 'text/html'
+        // console.log('len:' + len);
+        // console.log(items[0]);
+        // console.log(items[1]);
+        // console.log( 'items[0] kind:', items[0].kind );
+        // console.log( 'items[0] MIME type:', items[0].type );
+        // console.log( 'items[1] kind:', items[1].kind );
+        // console.log( 'items[1] MIME type:', items[1].type );
+
+        //阻止默认行为即不让剪贴板内容在div中显示出来
+        event.preventDefault();
+ 
+        //在items里找粘贴的image,据上面分析,需要循环  
+        for (var i = 0; i < len; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+            // console.log(items[i]);
+            // console.log( typeof (items[i]));
+
+            //getAsFile() 此方法只是living standard firefox ie11 并不支持        
+            blob = items[i].getAsFile();
+        }
+        }
+        if ( blob !== null ) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                // event.target.result 即为图片的Base64编码字符串
+                var base64_str = event.target.result
+                //可以在这里写上传逻辑 直接将base64编码的字符串上传（可以尝试传入blob对象，看看后台程序能否解析）
+                uploadImgFromPaste(base64_str, 'paste', isChrome);
+            }
+            reader.readAsDataURL(blob); 
+        }
+    } else {
+      //for firefox
+      setTimeout(function () {
+        //设置setTimeout的原因是为了保证图片先插入到div里，然后去获取值
+        var imgList = document.querySelectorAll('#tar_box img'),
+            len = imgList.length,
+            src_str = '',
+            i;
+        for ( i = 0; i < len; i ++ ) {
+            if ( imgList[i].className !== 'my_img' ) {
+                //如果是截图那么src_str就是base64 如果是复制的其他网页图片那么src_str就是此图片在别人服务器的地址
+                src_str = imgList[i].src;
+            }
+        }
+        uploadImgFromPaste(src_str, 'paste', isChrome);
+      }, 1);
+    }
+  } else {
+    //for ie11
+    setTimeout(function () {
+      var imgList = document.querySelectorAll('#tar_box img'),
+        len = imgList.length,
+        src_str = '',
+        i;
+      for ( i = 0; i < len; i ++ ) {
+        if ( imgList[i].className !== 'my_img' ) {
+          src_str = imgList[i].src;
+        }
+      }
+      uploadImgFromPaste(src_str, 'paste', isChrome);
+    }, 1);
+  }
+})
+ 
+function uploadImgFromPaste (file, type, isChrome) {
+    var className = 'chat-textarea';
+    var tarBox = document.getElementById('tar_box');
+    var a = document.createElement('a');
+    var id = "_id"+new Date().getTime();
+    a.id=id
+    tarBox.appendChild(a);
+    if ( isChrome ) {
+        var img = document.createElement('img');
+        img.src = file;
+        tarBox.appendChild(img);
+        down(id,file);
+    } else {
+        var imgList = document.querySelectorAll('#tar_box img'),
+        len = imgList.length,
+        i;
+        for ( i = 0; i < len; i ++) {
+        if ( imgList[i].className !== 'my_img' ) {
+            imgList[i].className = 'my_img';
+            imgList[i].src = "\'"+file+"\'";
+        }
+        }
+    }
+}
+//base64 生成画布，自动下载/手动触发下载
+function convertImageToCanvas(image) {
+    var canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = image.height;
+    canvas.getContext("2d").drawImage(image, 0, 0);
+    return canvas;
+}
+/**srcElement currentSrc
+ * 下载图片
+ */
+function down(id,file) {
+    var img = document.createElement("img");
+	img.src = file;
+	var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext("2d").drawImage(img, 0, 0);
+	
+    var url = canvas.toDataURL("image/png");//PNG格式
+    //以下代码为下载此图片功能
+    var triggerDownload = $("#"+id).attr("href", url).attr("download", "pic-"+id+".png");
+    triggerDownload[0].click();
+//    triggerDownload.remove();
+}
+// 利用 clipboardData 在网页中实现截屏粘贴的功能
+function pasteImg(textID) {
+    var imgReader = function (item) {
+        var blob = item.getAsFile(),
+            reader = new FileReader();
+
+        reader.onload = function (e) {
+
+            //显示图像
+            var msg = '<div> <image src=' + e.target.result + '/> </div>';
+            $('#image-'+textID).html(msg);
+        };
+
+        reader.readAsDataURL(blob);
+    };
+
+    document.querySelector("."+textID).addEventListener('paste', function (e) {
+        var clipboardData = e.clipboardData,
+            i = 0,
+            items, item, types;
+
+        if (clipboardData) {
+            items = clipboardData.items;
+
+            if (!items) {
+                return;
+            }
+
+            item = items[0];
+            types = clipboardData.types || [];
+
+            for (; i < types.length; i++) {
+                if (types[i] === 'Files') {
+                    item = items[i];
+                    break;
+                }
+            }
+
+            if (item && item.kind === 'file' && item.type.match(/^image\//i)) {
+                imgReader(item);
+            }
+        }
+    });
+}
+function escape2Html(str) { 
+ var arrEntities={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'}; 
+ return str.replace(/&(lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];}); 
+}
+
+function html2Escape(sHtml) { 
+ return sHtml.replace(/[<>&"]/g,
+function(c){
+ return {'<':'<','>':'>','&':'&','"':'"'}[c];
+ }); 
+}
+$(function(){
+
+    pasteImg("images");
+	  
+});
+</script>
+</body>
+</html>
