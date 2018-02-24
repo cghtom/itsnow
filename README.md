@@ -19,3 +19,5 @@ http://www.css88.com/archives/8468
 
 妙味课堂
 https://miaov.com/
+js 文档
+http://www.css88.com/jqapi-1.9/category/deferred-object/
