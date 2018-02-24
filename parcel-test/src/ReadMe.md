@@ -1,5 +1,14 @@
 1 npm install -g parcel-bundler
 2 parcel .\src\pages\index.html
+入门：
+http://www.css88.com/doc/parcel/
+http://www.css88.com/doc/parcel/assets.html
+
+github
+https://github.com/cghtom/parcel
+
+30 秒就能理解的 JavaScript 代码片段
+http://www.css88.com/30-seconds-of-code/
 
 优点：
 1 快速打包
