@@ -7,9 +7,6 @@ http://www.css88.com/doc/parcel/assets.html
 github
 https://github.com/cghtom/parcel
 
-30 秒就能理解的 JavaScript 代码片段
-http://www.css88.com/30-seconds-of-code/
-
 优点：
 1 快速打包
 Parcel 使用工作进程启用多核编译，并具有文件系统缓存，即使在重新启动后也可快速重新构建。
